@@ -13,7 +13,6 @@ app.get("/", (req, res) => {
     res.send("Hello, World!");
 });
 
-// v1 routes
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/tickets", ticketRoutes);
 
