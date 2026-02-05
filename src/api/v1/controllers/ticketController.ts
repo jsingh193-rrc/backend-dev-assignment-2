@@ -1,12 +1,19 @@
 import { Request, Response, NextFunction } from "express";
 import * as ticketService from "../services/ticketService";
+import { HTTP_STATUS } from "../../../constants/httpConstants";
 
-export const getAllTickets = (req: Request, res: Response, next: NextFunction): void => {
+export const getAllTickets = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    ticketService
-      .getAllTickets()
-      .then((tickets) => res.json(tickets))
-      .catch(next);
+    const tickets = await ticketService.getAllTickets();
+    res.status(HTTP_STATUS.OK).json({
+      message: "Tickets retrieved",
+      count: Array.isArray(tickets) ? tickets.length : 0,
+      data: tickets,
+    });
   } catch (error) {
     next(error);
   }
