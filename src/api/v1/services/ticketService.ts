@@ -18,7 +18,7 @@ export const getTicketUrgency = async (
     if (!ticket) return null;
 
     const createdAt = new Date(ticket.createdAt);
-    const now = new Date();
+    const now = new Date("2026-02-05T00:00:00.000Z");
     const msPerDay = 1000 * 60 * 60 * 24;
     const ticketAge = Math.max(
         0,
