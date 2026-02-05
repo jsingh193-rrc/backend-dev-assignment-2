@@ -5,7 +5,7 @@
     "description": "Footer still shows 2024",
     "priority": "low",
     "status": "open",
-    "createdAt": "2025-01-12T10:00:00.000Z"
+    "createdAt": "2026-02-02T15:00:00.000Z"
   },
   {
     "id": "2",
@@ -13,7 +13,7 @@
     "description": "Upload takes 30+ seconds",
     "priority": "medium",
     "status": "open",
-    "createdAt": "2025-01-13T10:00:00.000Z"
+    "createdAt": "2026-02-03T15:00:00.000Z"
   },
   {
     "id": "3",
@@ -21,7 +21,7 @@
     "description": "Dashboard takes 10+ seconds to load",
     "priority": "medium",
     "status": "open",
-    "createdAt": "2025-01-09T10:00:00.000Z"
+    "createdAt": "2026-01-30T15:00:00.000Z"
   },
   {
     "id": "4",
@@ -29,7 +29,7 @@
     "description": "Reset emails taking over 30 minutes",
     "priority": "high",
     "status": "open",
-    "createdAt": "2025-01-10T10:00:00.000Z"
+    "createdAt": "2026-01-31T15:00:00.000Z"
   },
   {
     "id": "5",
@@ -37,7 +37,7 @@
     "description": "PDF export fails silently",
     "priority": "high",
     "status": "open",
-    "createdAt": "2025-01-06T10:00:00.000Z"
+    "createdAt": "2026-01-27T15:00:00.000Z"
   },
   {
     "id": "6",
@@ -45,7 +45,7 @@
     "description": "Users report blank screen on login",
     "priority": "critical",
     "status": "open",
-    "createdAt": "2025-01-09T10:00:00.000Z"
+    "createdAt": "2026-01-30T15:00:00.000Z"
   },
   {
     "id": "7",
@@ -53,6 +53,6 @@
     "description": "Dark mode doesn't persist after refresh",
     "priority": "medium",
     "status": "resolved",
-    "createdAt": "2025-01-05T10:00:00.000Z"
+    "createdAt": "2026-01-26T15:00:00.000Z"
   }
 ]
