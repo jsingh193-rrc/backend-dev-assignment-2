@@ -14,5 +14,5 @@ export interface Ticket {
 export interface TicketUrgencyResult {
   ticketAge: number;
   urgencyScore: number;
-  urgencyLevel: TicketPriority;
+  urgencyLevel: string;
 }

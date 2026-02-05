@@ -21,7 +21,34 @@ export const getAllTickets = async (
 
 export const getTicketUrgency = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    res.send("Hello, world!");
+    const ticketId: string = Array.isArray((req.params as any).ticketId)
+      ? (req.params as any).ticketId[0]
+      : (req.params as any).ticketId as string;
+    ticketService
+      .getTicketUrgency(ticketId)
+      .then((result) => {
+        if (!result) {
+          return res
+            .status(HTTP_STATUS.NOT_FOUND)
+            .json({ message: "Ticket not found", data: null });
+        }
+
+        const { ticket, metrics } = result;
+        return res.status(HTTP_STATUS.OK).json({
+          message: "Ticket urgency calculated",
+          data: {
+            id: isNaN(Number(ticket.id)) ? ticket.id : Number(ticket.id),
+            title: ticket.title,
+            priority: ticket.priority,
+            status: ticket.status,
+            createdAt: ticket.createdAt,
+            ticketAge: metrics.ticketAge,
+            urgencyScore: metrics.urgencyScore,
+            urgencyLevel: metrics.urgencyLevel,
+          },
+        });
+      })
+      .catch(next);
   } catch (error) {
     next(error);
   }
