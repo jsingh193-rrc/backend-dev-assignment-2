@@ -1,16 +1,42 @@
 import { Ticket, TicketPriority, TicketUrgencyResult } from "./ticketTypes";
 import items from "../../../data/items.json";
 
+const ticketsStore: Ticket[] = (items as Ticket[]).map((t) => ({ ...t }));
+
 export const getAllTickets = async (): Promise<Ticket[]> => {
-    return items as Ticket[];
+    return structuredClone(ticketsStore);
+};
+
+export const createTicket = async (data: {
+    title: string;
+    description: string;
+    priority: TicketPriority;
+    status?: "open" | "resolved";
+}): Promise<Ticket> => {
+    const nextId = (() => {
+        const ids = ticketsStore.map((t) => Number(t.id)).filter((n) => !isNaN(n));
+        const maxId = ids.length ? Math.max(...ids) : 0;
+        return String(maxId + 1);
+    })();
+
+    const newTicket: Ticket = {
+        id: nextId,
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        status: data.status ?? "open",
+        createdAt: "2026-02-05T00:00:00.000Z",
+    };
+
+    ticketsStore.push(newTicket);
+    return structuredClone(newTicket);
 };
 
 export const getTicketUrgency = async (
     ticketId: string
-): Promise<{ ticket: Ticket; metrics: TicketUrgencyResult } | null> => {
+): Promise<{ ticket: Ticket; score: TicketUrgencyResult } | null> => {
     const idNum = Number(ticketId);
-    const tickets = items as Ticket[];
-    const ticket = tickets.find((t) => {
+    const ticket = ticketsStore.find((t) => {
         if (!isNaN(idNum)) return Number(t.id) === idNum;
         return String(t.id) === ticketId;
     });
@@ -43,7 +69,7 @@ export const getTicketUrgency = async (
 
     return {
         ticket,
-        metrics: {
+        score: {
             ticketAge,
             urgencyScore,
             urgencyLevel,

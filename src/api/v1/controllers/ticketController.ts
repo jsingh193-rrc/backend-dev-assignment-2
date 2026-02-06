@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as ticketService from "../services/ticketService";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
+import { TicketPriority, TicketStatus } from "../services/ticketTypes";
 
 export const getAllTickets = async (
   req: Request,
@@ -19,6 +20,51 @@ export const getAllTickets = async (
   }
 };
 
+export const createTicket = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { title, description, priority, status } = req.body ?? {};
+
+    const errors: string[] = [];
+    if (!title || typeof title !== "string" || title.trim().length === 0) {
+      errors.push("Missing required field: title");
+    }
+    if (!description || typeof description !== "string") {
+      errors.push("Missing required field: description");
+    }
+    const allowedPriorities: TicketPriority[] = ["critical", "high", "medium", "low"];
+    if (!allowedPriorities.includes(priority as TicketPriority)) {
+      errors.push("Invalid priority. Must be one of: critical, high, medium, low");
+    }
+
+    if (errors.length) {
+      res.status(HTTP_STATUS.BAD_REQUEST).json({
+        message: "Validation failed",
+        errors,
+      });
+      return;
+    }
+
+    const created = await ticketService.createTicket({
+      title: (title as string).trim(),
+      description: description as string,
+      priority: priority as TicketPriority,
+      status: status as TicketStatus | undefined,
+    });
+
+    res.status(HTTP_STATUS.CREATED).json({
+      message: "Ticket created",
+      data: created,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getTicketUrgency = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const ticketId: string = Array.isArray((req.params as any).ticketId)
@@ -28,13 +74,14 @@ export const getTicketUrgency = (req: Request, res: Response, next: NextFunction
       .getTicketUrgency(ticketId)
       .then((result) => {
         if (!result) {
-          return res
+          res
             .status(HTTP_STATUS.NOT_FOUND)
             .json({ message: "Ticket not found", data: null });
+          return;
         }
 
-        const { ticket, metrics } = result;
-        return res.status(HTTP_STATUS.OK).json({
+        const { ticket, score } = result;
+        res.status(HTTP_STATUS.OK).json({
           message: "Ticket urgency calculated",
           data: {
             id: isNaN(Number(ticket.id)) ? ticket.id : Number(ticket.id),
@@ -42,11 +89,12 @@ export const getTicketUrgency = (req: Request, res: Response, next: NextFunction
             priority: ticket.priority,
             status: ticket.status,
             createdAt: ticket.createdAt,
-            ticketAge: metrics.ticketAge,
-            urgencyScore: metrics.urgencyScore,
-            urgencyLevel: metrics.urgencyLevel,
+            ticketAge: score.ticketAge,
+            urgencyScore: score.urgencyScore,
+            urgencyLevel: score.urgencyLevel,
           },
         });
+        return;
       })
       .catch(next);
   } catch (error) {
