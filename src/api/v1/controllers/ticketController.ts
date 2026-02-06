@@ -76,7 +76,7 @@ export const getTicketUrgency = (req: Request, res: Response, next: NextFunction
         if (!result) {
           res
             .status(HTTP_STATUS.NOT_FOUND)
-            .json({ message: "Ticket not found", data: null });
+            .json({ message: "Error 404: Ticket not found", data: null });
           return;
         }
 
