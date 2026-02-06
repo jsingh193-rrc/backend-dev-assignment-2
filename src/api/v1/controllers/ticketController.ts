@@ -101,3 +101,49 @@ export const getTicketUrgency = (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
+export const updateTicket = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const ticketId: string = Array.isArray((req.params as any).ticketId)
+      ? (req.params as any).ticketId[0]
+      : (req.params as any).ticketId as string;
+
+    const { priority, status } = req.body ?? {};
+
+    const errors: string[] = [];
+    const allowedPriorities: TicketPriority[] = ["critical", "high", "medium", "low"];
+    const allowedStatus: TicketStatus[] = ["open", "resolved"];
+
+    if (priority !== undefined && !allowedPriorities.includes(priority as TicketPriority)) {
+      errors.push("Invalid priority. Must be one of: critical, high, medium, low");
+    }
+
+    if (status !== undefined && !allowedStatus.includes(status as TicketStatus)) {
+      errors.push("Invalid status. Must be one of: open, resolved");
+    }
+
+    if (errors.length) {
+      res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Validation failed", errors });
+      return;
+    }
+
+    const updated = await ticketService.updateTicket(ticketId, {
+      priority: priority as TicketPriority | undefined,
+      status: status as TicketStatus | undefined,
+    });
+
+    if (!updated) {
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Ticket not found" });
+      return;
+    }
+
+    res.status(HTTP_STATUS.OK).json({ message: "Ticket updated", data: updated });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};

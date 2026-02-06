@@ -1,4 +1,4 @@
-import { Ticket, TicketPriority, TicketUrgencyResult } from "./ticketTypes";
+import { Ticket, TicketPriority, TicketStatus, TicketUrgencyResult } from "./ticketTypes";
 import items from "../../../data/items.json";
 
 const ticketsStore: Ticket[] = (items as Ticket[]).map((t) => ({ ...t }));
@@ -11,7 +11,7 @@ export const createTicket = async (data: {
     title: string;
     description: string;
     priority: TicketPriority;
-    status?: "open" | "resolved";
+    status?: TicketStatus;
 }): Promise<Ticket> => {
     const nextId = (() => {
         const ids = ticketsStore.map((t) => Number(t.id)).filter((n) => !isNaN(n));
@@ -30,6 +30,29 @@ export const createTicket = async (data: {
 
     ticketsStore.push(newTicket);
     return structuredClone(newTicket);
+};
+
+export const updateTicket = async (
+    ticketId: string,
+    updates: { priority?: TicketPriority; status?: TicketStatus }
+): Promise<Ticket | null> => {
+    const idNum = Number(ticketId);
+    const index = ticketsStore.findIndex((t) => {
+        if (!isNaN(idNum)) return Number(t.id) === idNum;
+        return String(t.id) === ticketId;
+    });
+
+    if (index === -1) return null;
+
+    const existing = ticketsStore[index];
+    const updated: Ticket = {
+        ...existing,
+        priority: updates.priority ?? existing.priority,
+        status: updates.status ?? existing.status,
+    };
+
+    ticketsStore[index] = updated;
+    return structuredClone(updated);
 };
 
 export const getTicketUrgency = async (
