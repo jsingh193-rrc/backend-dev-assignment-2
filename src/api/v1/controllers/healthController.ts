@@ -1,9 +1,11 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 
-export const getHealth = (req: Request, res: Response, next: NextFunction): void => {
-  try {
-    res.send("Hello, world!");
-  } catch (error) {
-    next(error);
-  }
+export const getHealth = (req: Request, res: Response): void => {
+  res.json({
+        status: "OK",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        version: "1.0.0",
+    });
+
 };
